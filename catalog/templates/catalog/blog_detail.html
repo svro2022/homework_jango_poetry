@@ -1,0 +1,38 @@
+{% extends 'catalog/base.html' %}
+{% block content %}
+
+    <div class="col">
+                <div class="card mb-4 rounded-3 shadow-sm border-primary">
+
+                    <div class="card-header py-3 text-bg-primary border-primary">
+                        <h4 class="my-0 fw-normal text-center">{{ object.title|title }}</h4>
+                    </div>
+
+                    <div class="card-body">
+
+
+                        <p class="card-text">Описание: {{ object.body|truncatechars:100 }}</p>
+                        <p class="card-text">Дата создания: {{ object.data_create }}</p>
+                        <p class="card-text">Дата редактирования: {{ object.is_published}}</p>
+                        <p class="card-text">Количество просмотров: {{ object.views_count}}</p>
+
+
+                        <ul class="list-unstyled mt-3 mb-4">
+
+                                <li><p class="fw-bold">Примечание: карточка одного блога</p></li>
+                        </ul>
+
+                        <button type="button" class="btn btn-lg btn-block btn-outline-primary" ><a href="{% url 'catalog:blog_update' object.pk %}" style="text-decoration: none;">Редактировать пост</a></button>
+                        <button type="button" class="btn btn-lg btn-block btn-outline-danger float-right" ><a href="{% url 'catalog:blog_delete' object.pk %}" style="text-decoration: none;">Удалить пост</a></button>
+
+
+                    </div>
+                </div>
+
+
+            </div>
+
+
+
+
+      {% endblock %}

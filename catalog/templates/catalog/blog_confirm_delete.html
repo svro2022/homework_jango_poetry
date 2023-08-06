@@ -1,0 +1,29 @@
+{% extends 'catalog/base.html' %}
+
+{% block content %}
+
+<form method="post">
+
+    <div class="col">
+                <div class="card mb-4 rounded-3 shadow-sm border-primary">
+                    <div class="card-header py-3 text-bg-primary border-primary">
+                        Удаление поста
+                    </div>
+
+                    <div class="card-body">
+
+                            {% csrf_token %}
+                            <p>Вы действительно хотите удалить запись - {{ object.title }} ?</p>
+                            <button type="submit" class="btn btn-outline-danger">
+                                Удалить
+                            </button>
+                            <a class="btn btn-outline-warning" href="{% url 'catalog:blog_index' %}">Отмена</a>
+
+                    </div>
+                </div>
+            </div>
+
+</form>
+
+
+      {% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'catalog/base.html' %}
+{% load my_tags %}
+{% block content %}
+
+
+    <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+        {% for object in object_list %}
+
+            <div class="col">
+                <div class="card mb-4 rounded-3 shadow-sm border-primary">
+                    <div class="card-header py-3 text-bg-primary border-primary">
+                        <h4 class="my-0 fw-normal">{{ object.name|title }}</h4>
+                    </div>
+                    <div class="card-body">
+
+                        <img class="card-img-top"
+                                 alt="Card image cap"
+                            {#   src="/media/{{ object.picture }}"#}
+                                src="{{ object.picture|mediapath }}"
+                        >
+
+                        <ul class="list-unstyled mt-3 mb-4">
+
+                            {{ object.description|truncatechars:100 }}
+                                <li>Примечание: карточки всех товаров</li>
+
+                        </ul>
+                    <a href="{% url 'catalog:product_detailed' object.pk %}" type="button" class="w-100 btn btn-lg btn-primary">Подробнее о товаре</a>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+        {% endfor %}
+
+
+
+    </div>
+
+
+
+
+
+      {% endblock %}

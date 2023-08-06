@@ -1,0 +1,42 @@
+{% extends 'catalog/base.html' %}
+{% block content %}
+
+
+    <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+
+        <div class="col-12 mb-5">
+        <a href="{% url 'catalog:blog_create' %}" class="btn btn-primary">Создать пост</a>
+        </div>
+
+        {% for object in object_list %}
+
+            <div class="col">
+                <div class="card mb-4 rounded-3 shadow-sm border-primary">
+
+                    <div class="card-header py-3 text-bg-primary border-primary">
+                        <h4 class="my-0 fw-normal">{{ object.title|title }}</h4>
+                    </div>
+
+                    <div class="card-body">
+                        <p>{{ object.body|truncatechars:100 }}</p>
+
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li>- Создан: {{ object.data_create }}</li>
+                            <li>- Просмотров: {{ object.views_count }}</li>
+                            </ul>
+                        <a href="{% url 'catalog:blog_detail' object.pk %}" type="button" class="w-100 btn btn-lg btn-primary">Подробнее</a>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        {% endfor %}
+
+
+
+    </div>
+
+
+      {% endblock %}
