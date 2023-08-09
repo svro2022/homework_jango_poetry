@@ -26,6 +26,12 @@
 
                         </ul>
                     <a href="{% url 'catalog:product_detailed' object.pk %}" type="button" class="w-100 btn btn-lg btn-primary">Подробнее о товаре</a>
+                        <hr>
+
+                        <div class="btn-group">
+                        <a href="{% url 'catalog:product_update' object.pk %}" class="btn btn-primary">Edit</a>
+                        <a href="{% url 'catalog:product_delete' object.pk %}" class="btn btn-primary">Delete</a>
+                        </div>
 
                     </div>
                 </div>
