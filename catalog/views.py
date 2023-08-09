@@ -3,7 +3,7 @@ from catalog.models import Category, Product, Blog
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
 from pytils.translit import slugify
-from forms import ProductForm
+from catalog.forms import ProductForm
 
 '''ФОРМА CATALOG'''
 
