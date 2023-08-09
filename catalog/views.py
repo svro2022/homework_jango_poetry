@@ -3,7 +3,7 @@ from catalog.models import Category, Product, Blog
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
 from pytils.translit import slugify
-
+from forms import ProductForm
 
 '''ФОРМА CATALOG'''
 
@@ -90,6 +90,16 @@ class CategoryProductsListView(ListView):
         return context_data
 
 
+
+
+class ProductCreateView(CreateView):
+    '''CREATE - создается продукт (использование форм)'''
+    model = Product
+    form_class = ProductForm
+    success_url = reverse_lazy('catalog:index')
+
+
+
 # FBV подход
 # def products(request):
 # '''контроллер страницы всех товаров без категорий'''
@@ -100,10 +110,11 @@ class CategoryProductsListView(ListView):
 # return render(request, "catalog/products_all.html", context)
 
 
+
 '''CBV подход'''
 
 class ProductsListView(ListView):
-    '''Контролер страницы Товары. Отображает все товары без категорий'''
+    '''READ - Контролер страницы Товары. Отображает все товары без категорий'''
     model = Product
     template_name = 'catalog/products_all.html'
     extra_context = {
@@ -133,13 +144,30 @@ class ProductsListView(ListView):
 '''CBV подход'''
 
 class ProductDetailView(DetailView):
-    '''Контроллер страницы одного товара'''
+    '''READ - Контроллер страницы одного товара'''
     model = Product
     template_name = 'catalog/product_detail.html'
     extra_context = {
         'title': 'Онлайн магазин',
         'title_text': 'Добро пожаловать! Ознакомьтесь с товаром.'
     }
+
+
+class ProductUpdateView(UpdateView):
+    ''' UPDATE - обновление продукта (использование форм)'''
+    model = Product
+    form_class = ProductForm
+    success_url = reverse_lazy('catalog:index')
+
+    def get_success_url(self):
+        return reverse('catalog:product_detail', args=[self.kwargs.get('pk')])
+
+
+
+class ProductDeleteView(DeleteView):
+    '''DELETE - удаление продукта'''
+    model = Product
+    success_url = reverse_lazy('catalog:index')
 
 
 
