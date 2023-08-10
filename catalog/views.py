@@ -1,9 +1,10 @@
 from django.shortcuts import render
-from catalog.models import Category, Product, Blog
+from catalog.models import Category, Product, Blog, Version
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy, reverse
 from pytils.translit import slugify
-from catalog.forms import ProductForm
+from catalog.forms import ProductForm, VersionForm
+from django.forms import inlineformset_factory
 
 '''ФОРМА CATALOG'''
 
@@ -161,6 +162,26 @@ class ProductUpdateView(UpdateView):
 
     def get_success_url(self):
         return reverse('catalog:product_detail', args=[self.kwargs.get('pk')])
+
+    def get_context_data(self, **kwargs):
+        '''Формирование формсета'''
+        context_data = super().get_context_data(**kwargs)
+        version_formset = inlineformset_factory(Product, Version, form=VersionForm, extra=1)
+        if self.request.method == "POST":
+            context_data['formset'] = version_formset(self.request.POST, instance=self.object)
+        else:
+            context_data['formset'] = version_formset(instance=self.object)
+        return context_data
+
+    def form_valid(self, form):
+        formset = self.get_context_data()['formset']
+        self.object = form.save()
+
+        if formset.is_valid():
+            formset.instance = self.object
+            formset.save()
+
+        return super().form_valid(form)
 
 
 
