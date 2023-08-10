@@ -161,7 +161,7 @@ class ProductUpdateView(UpdateView):
     success_url = reverse_lazy('catalog:index')
 
     def get_success_url(self):
-        return reverse('catalog:product_detail', args=[self.kwargs.get('pk')])
+        return reverse('catalog:product_detailed', args=[self.kwargs.get('pk')])
 
     def get_context_data(self, **kwargs):
         '''Формирование формсета'''
