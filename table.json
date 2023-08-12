@@ -1,0 +1,117 @@
+[
+{
+  "model": "catalog.category",
+  "pk": 1,
+  "fields": {
+    "name": "Канцтовары",
+    "description": ""
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 2,
+  "fields": {
+    "name": "Наушники",
+    "description": ""
+  }
+},
+{
+  "model": "catalog.category",
+  "pk": 3,
+  "fields": {
+    "name": "Смартфоны",
+    "description": ""
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 1,
+  "fields": {
+    "name": "Бумага SVETOCOPY Classic",
+    "description": "A4, офисная, белая, 500л",
+    "picture": "",
+    "category": 1,
+    "price": 1500,
+    "data_create": "2023-07-24T15:00:00Z",
+    "data_edit": null
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 2,
+  "fields": {
+    "name": "Маркер для досок Silwerhof Prime",
+    "description": "черный, для досок",
+    "picture": "",
+    "category": 1,
+    "price": 300,
+    "data_create": "2023-08-01T12:00:00Z",
+    "data_edit": "2023-08-06T07:26:56Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 3,
+  "fields": {
+    "name": "Наушники Edifier W600BT",
+    "description": "3.5 мм/Bluetooth, накладные, черный",
+    "picture": "",
+    "category": 2,
+    "price": 3000,
+    "data_create": "2023-07-20T17:00:00Z",
+    "data_edit": "2023-08-02T10:00:00Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 4,
+  "fields": {
+    "name": "Наушники Samsung EO-IC100",
+    "description": "USB Type-C, вкладыши, черный",
+    "picture": "",
+    "category": 2,
+    "price": 2000,
+    "data_create": "2023-08-04T12:00:00Z",
+    "data_edit": "2023-08-06T07:00:00Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 5,
+  "fields": {
+    "name": "Смартфон Huawei P60 Pro 8",
+    "description": "4G, 256Gb, жемчужина рококо",
+    "picture": "",
+    "category": 3,
+    "price": 71000,
+    "data_create": "2023-07-24T15:00:00Z",
+    "data_edit": null
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 6,
+  "fields": {
+    "name": "Смартфон Honor X8a",
+    "description": "128Gb, 5G, 128Gb, небесно-голубой",
+    "picture": "",
+    "category": 3,
+    "price": 19000,
+    "data_create": "2023-07-21T12:00:00Z",
+    "data_edit": "2023-08-03T12:00:00Z"
+  }
+},
+{
+  "model": "catalog.blog",
+  "pk": 1,
+  "fields": {
+    "title": "new_post",
+    "slug": "newpost",
+    "body": "some text",
+    "preview": "",
+    "data_create": "2023-07-31T00:00:00Z",
+    "is_published": true,
+    "views_count": 4
+  }
+}
+]
