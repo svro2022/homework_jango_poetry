@@ -1,13 +1,15 @@
 from django.shortcuts import render
 from django.contrib.auth.views import LoginView as BaseLoginView
 from django.contrib.auth.views import LogoutView as BaseLogoutView
-from django.views.generic import CreateView, TemplateView
-from django.urls import reverse_lazy
+from django.views.generic import CreateView, TemplateView, UpdateView
+from django.urls import reverse_lazy, reverse
 from users.models import User
-from users.forms import UserForm
+from users.forms import UserRegisterForm, UserProfileForm
 from config import settings
 from django.core.mail import send_mail
 from users.email_services import sendmail
+from django.shortcuts import redirect
+import random
 
 
 class LoginView(BaseLoginView):
@@ -23,13 +25,12 @@ class LogoutView(BaseLogoutView):
 class RegisterView(CreateView):
     '''Контроллер регистрации пользователя'''
     model = User
-    form_class = UserForm
+    form_class = UserRegisterForm
     template_name = 'users/register.html'
     success_url = reverse_lazy('users:login')
 
     def form_valid(self, form):
-        '''Отправка письма на email'''
-
+        # '''Отправка письма на email'''
         # new_user = form.save()
         # send_mail(
         # subject='Поздравляем с регистрацией',
@@ -43,7 +44,7 @@ class RegisterView(CreateView):
         if form.is_valid:
             new_user = form.save()
             sendmail(
-                f'Для верификации почты пройдите по ссылке http://127.0.0.1:8000/users/confirm_email/{new_user.pk}',
+                f'Для подтверждения почты пройдите по ссылке http://127.0.0.1:8000/users/confirm_email/{new_user.pk}',
                 (new_user.email,),
             )
         return super().form_valid(form)
@@ -64,3 +65,26 @@ class ConfirmPage(TemplateView):
         return context_data
 
 
+class UserUpdateView(UpdateView):
+    '''Профиль пользователя'''
+    model = User
+    form_class = UserProfileForm
+    template_name = 'users/user_form.html'
+    success_url = reverse_lazy('users:profile')
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+
+def generate_new_password(request):
+    '''Изменение пароля'''
+    new_password = ''.join([str(random.randint(0, 9)) for _ in range(12)])
+    send_mail(
+        subject='Вы сменили пароль',
+        message=f'Ваш новый пароль: {new_password}',
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[request.user.email]
+    )
+    request.user.set_password(new_password)
+    request.user.save()
+    return redirect(reverse('catalog:index'))
