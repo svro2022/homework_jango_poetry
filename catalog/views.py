@@ -6,6 +6,8 @@ from pytils.translit import slugify
 from catalog.forms import ProductForm, VersionForm
 from django.forms import inlineformset_factory
 
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+
 '''ФОРМА CATALOG'''
 
 # FBV подход
@@ -92,12 +94,22 @@ class CategoryProductsListView(ListView):
 
 
 
-
-class ProductCreateView(CreateView):
+class ProductCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
     '''CREATE - создается продукт (использование форм)'''
+    '''LoginRequiredMixin, PermissionRequiredMixin - скрывают контент от неавторизованных пользователей
+        Обязательное указание permission_required '''
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('catalog:index')
+    permission_required = 'catalog.product_create'
+
+    def form_valid(self, form):
+        self.object = form.save()
+        self.object.owner = self.request.user
+        self.object.save()
+
+        return super().form_valid(form)
+
 
 
 
@@ -114,10 +126,13 @@ class ProductCreateView(CreateView):
 
 '''CBV подход'''
 
-class ProductsListView(ListView):
+class ProductsListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     '''READ - Контролер страницы Товары. Отображает все товары без категорий'''
+    '''LoginRequiredMixin, PermissionRequiredMixin - скрывают контент от неавторизованных пользователей
+            Обязательное указание permission_required '''
     model = Product
     template_name = 'catalog/products_all.html'
+    permission_required = 'catalog.products'
     extra_context = {
         'title': 'Онлайн магазин',
         'title_text': 'Добро пожаловать! Ознакомьтесь с товарами.'
@@ -144,21 +159,27 @@ class ProductsListView(ListView):
 
 '''CBV подход'''
 
-class ProductDetailView(DetailView):
+class ProductDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
     '''READ - Контроллер страницы одного товара'''
+    '''LoginRequiredMixin, PermissionRequiredMixin - скрывают контент от неавторизованных пользователей
+                Обязательное указание permission_required '''
     model = Product
     template_name = 'catalog/product_detail.html'
+    permission_required = 'catalog.product_detailed'
     extra_context = {
         'title': 'Онлайн магазин',
         'title_text': 'Добро пожаловать! Ознакомьтесь с товаром.'
     }
 
 
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     ''' UPDATE - обновление продукта (использование форм)'''
+    '''LoginRequiredMixin, PermissionRequiredMixin - скрывают контент от неавторизованных пользователей
+                    Обязательное указание permission_required '''
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('catalog:index')
+    permission_required = 'catalog.product_update'
 
     def get_success_url(self):
         return reverse('catalog:product_detailed', args=[self.kwargs.get('pk')])
@@ -185,10 +206,13 @@ class ProductUpdateView(UpdateView):
 
 
 
-class ProductDeleteView(DeleteView):
+class ProductDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     '''DELETE - удаление продукта'''
+    '''LoginRequiredMixin, PermissionRequiredMixin - скрывают контент от неавторизованных пользователей
+                        Обязательное указание permission_required '''
     model = Product
     success_url = reverse_lazy('catalog:index')
+    permission_required = 'catalog.product_delete'
 
 
 

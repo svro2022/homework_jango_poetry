@@ -1,4 +1,5 @@
 from django.db import models
+from users.models import User
 
 # Catalog
 
@@ -27,6 +28,7 @@ class Product(models.Model):
     price = models.IntegerField(verbose_name='Цена')
     data_create = models.DateTimeField(**NULLABLE, verbose_name='Дата создания')
     data_edit = models.DateTimeField(**NULLABLE, verbose_name='Дата изменения')
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE, **NULLABLE)
 
     def __str__(self):
         return f'{self.name} {self.description}'
