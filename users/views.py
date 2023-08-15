@@ -44,7 +44,7 @@ class RegisterView(CreateView):
         if form.is_valid:
             new_user = form.save()
             sendmail(
-                f'Для подтверждения почты пройдите по ссылке http://127.0.0.1:8000/users/confirm_email/{new_user.pk}',
+                f'Для подтверждения почты пройдите по ссылке http://127.0.0.1:8000/{new_user.pk}/confirm_email/',
                 (new_user.email,),
             )
         return super().form_valid(form)

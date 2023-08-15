@@ -94,9 +94,9 @@ class CategoryProductsListView(ListView):
 
 
 
-class ProductCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView):
+class ProductCreateView(LoginRequiredMixin, CreateView):
     '''CREATE - создается продукт (использование форм)'''
-    '''LoginRequiredMixin, PermissionRequiredMixin - скрывают контент от неавторизованных пользователей
+    '''LoginRequiredMixin - скрывает контент от неавторизованных пользователей
         Обязательное указание permission_required '''
     model = Product
     form_class = ProductForm
@@ -104,9 +104,7 @@ class ProductCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView)
     permission_required = 'catalog.product_create'
 
     def form_valid(self, form):
-        self.object = form.save()
-        self.object.owner = self.request.user
-        self.object.save()
+        form.instance.user = self.request.user
 
         return super().form_valid(form)
 
@@ -126,13 +124,10 @@ class ProductCreateView(PermissionRequiredMixin, LoginRequiredMixin, CreateView)
 
 '''CBV подход'''
 
-class ProductsListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+class ProductsListView(ListView):
     '''READ - Контролер страницы Товары. Отображает все товары без категорий'''
-    '''LoginRequiredMixin, PermissionRequiredMixin - скрывают контент от неавторизованных пользователей
-            Обязательное указание permission_required '''
     model = Product
     template_name = 'catalog/products_all.html'
-    permission_required = 'catalog.products'
     extra_context = {
         'title': 'Онлайн магазин',
         'title_text': 'Добро пожаловать! Ознакомьтесь с товарами.'
@@ -159,22 +154,20 @@ class ProductsListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
 '''CBV подход'''
 
-class ProductDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+class ProductDetailView(DetailView):
     '''READ - Контроллер страницы одного товара'''
-    '''LoginRequiredMixin, PermissionRequiredMixin - скрывают контент от неавторизованных пользователей
-                Обязательное указание permission_required '''
+
     model = Product
     template_name = 'catalog/product_detail.html'
-    permission_required = 'catalog.product_detailed'
     extra_context = {
         'title': 'Онлайн магазин',
         'title_text': 'Добро пожаловать! Ознакомьтесь с товаром.'
     }
 
 
-class ProductUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+class ProductUpdateView(LoginRequiredMixin, UpdateView):
     ''' UPDATE - обновление продукта (использование форм)'''
-    '''LoginRequiredMixin, PermissionRequiredMixin - скрывают контент от неавторизованных пользователей
+    '''LoginRequiredMixin - скрывают контент от неавторизованных пользователей
                     Обязательное указание permission_required '''
     model = Product
     form_class = ProductForm
@@ -206,9 +199,9 @@ class ProductUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView)
 
 
 
-class ProductDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class ProductDeleteView(LoginRequiredMixin, DeleteView):
     '''DELETE - удаление продукта'''
-    '''LoginRequiredMixin, PermissionRequiredMixin - скрывают контент от неавторизованных пользователей
+    '''LoginRequiredMixin - скрывают контент от неавторизованных пользователей
                         Обязательное указание permission_required '''
     model = Product
     success_url = reverse_lazy('catalog:index')
