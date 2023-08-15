@@ -1,12 +1,11 @@
 {% extends 'catalog/base.html' %}
 {% block content %}
 
-
-    <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
-
-        <div class="col-12 mb-5">
+<div class="col-12 mb-5">
         <a href="{% url 'catalog:blog_create' %}" class="btn btn-primary">Создать пост</a>
         </div>
+
+    <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
 
         {% for object in object_list %}
 
