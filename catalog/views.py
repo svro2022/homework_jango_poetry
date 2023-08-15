@@ -6,7 +6,7 @@ from pytils.translit import slugify
 from catalog.forms import ProductForm, VersionForm
 from django.forms import inlineformset_factory
 
-from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 '''ФОРМА CATALOG'''
 
@@ -96,12 +96,10 @@ class CategoryProductsListView(ListView):
 
 class ProductCreateView(LoginRequiredMixin, CreateView):
     '''CREATE - создается продукт (использование форм)'''
-    '''LoginRequiredMixin - скрывает контент от неавторизованных пользователей
-        Обязательное указание permission_required '''
+    '''LoginRequiredMixin - скрывает контент от неавторизованных пользователей'''
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('catalog:index')
-    permission_required = 'catalog.product_create'
 
     def form_valid(self, form):
         form.instance.user = self.request.user
@@ -167,12 +165,10 @@ class ProductDetailView(DetailView):
 
 class ProductUpdateView(LoginRequiredMixin, UpdateView):
     ''' UPDATE - обновление продукта (использование форм)'''
-    '''LoginRequiredMixin - скрывают контент от неавторизованных пользователей
-                    Обязательное указание permission_required '''
+    '''LoginRequiredMixin - скрывают контент от неавторизованных пользователей'''
     model = Product
     form_class = ProductForm
     success_url = reverse_lazy('catalog:index')
-    permission_required = 'catalog.product_update'
 
     def get_success_url(self):
         return reverse('catalog:product_detailed', args=[self.kwargs.get('pk')])
@@ -201,18 +197,17 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
 
 class ProductDeleteView(LoginRequiredMixin, DeleteView):
     '''DELETE - удаление продукта'''
-    '''LoginRequiredMixin - скрывают контент от неавторизованных пользователей
-                        Обязательное указание permission_required '''
+    '''LoginRequiredMixin - скрывают контент от неавторизованных пользователей'''
     model = Product
     success_url = reverse_lazy('catalog:index')
-    permission_required = 'catalog.product_delete'
 
 
 
 '''ФОРМА BLOG'''
 
-class BlogCreateView(CreateView):
+class BlogCreateView(LoginRequiredMixin, CreateView):
     '''CREATE - создается запись'''
+    '''LoginRequiredMixin - скрывают контент от неавторизованных пользователей'''
     model = Blog
     fields = ('title', 'slug', 'body', 'preview', 'data_create', 'is_published', 'views_count',)
     success_url = reverse_lazy('catalog:blog_index')
@@ -249,8 +244,9 @@ class BlogDetailView(DetailView):
         return self.object
 
 
-class BlogUpdateView(UpdateView):
+class BlogUpdateView(LoginRequiredMixin, UpdateView):
     '''UPDATE - обновление записи'''
+    '''LoginRequiredMixin - скрывают контент от неавторизованных пользователей'''
     model = Blog
     fields = ('title', 'slug', 'body', 'preview', 'data_create', 'is_published', 'views_count',)
     success_url = reverse_lazy('catalog:blog_index')
@@ -268,8 +264,9 @@ class BlogUpdateView(UpdateView):
         return reverse('catalog:blog_detail', args=[self.kwargs.get('pk')])
 
 
-class BlogDeleteView(DeleteView):
+class BlogDeleteView(LoginRequiredMixin, DeleteView):
     '''DELETE - удаление записи'''
+    '''LoginRequiredMixin - скрывают контент от неавторизованных пользователей'''
     model = Blog
     success_url = reverse_lazy('catalog:blog_index')
 
