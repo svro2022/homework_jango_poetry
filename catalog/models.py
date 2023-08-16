@@ -29,6 +29,7 @@ class Product(models.Model):
     data_create = models.DateTimeField(**NULLABLE, verbose_name='Дата создания')
     data_edit = models.DateTimeField(**NULLABLE, verbose_name='Дата изменения')
     user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE, **NULLABLE)
+    is_published = models.BooleanField(default=False, **NULLABLE, verbose_name="Статус публикации")
 
     def __str__(self):
         return f'{self.name} {self.description}'
@@ -37,6 +38,12 @@ class Product(models.Model):
         verbose_name = 'Продукт'
         verbose_name_plural = 'Продукты'
         ordering = ('name', 'data_create',)
+        permissions = [
+            (
+                'set_published',
+                'Can publish product'
+            )
+        ]
 
 
 # Blog

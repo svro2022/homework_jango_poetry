@@ -6,11 +6,14 @@ from pytils.translit import slugify
 from catalog.forms import ProductForm, VersionForm
 from django.forms import inlineformset_factory
 
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
+from django.http import Http404
 
 '''ФОРМА CATALOG'''
 
 # FBV подход
+# @login_required # скрывает контент от неавторизованных пользователей
 # def index(request):
 # '''контроллер главной страницы'''
 # context = {
@@ -23,8 +26,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 '''CBV подход'''
 
-class MainListView(ListView):
+class MainListView(LoginRequiredMixin, ListView):
     '''Контролер главной страницы. Отображает все товары без категорий'''
+    '''LoginRequiredMixin - скрывает контент от неавторизованных пользователей'''
     model = Product
     template_name = 'catalog/index.html'
     extra_context = {
@@ -32,8 +36,16 @@ class MainListView(ListView):
         'title_text': 'Добро пожаловать! Выбираем нужный товар.'
     }
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(is_published=True)
+
+        return queryset
+
 
 # FBV подход
+# @login_required # скрывает контент от неавторизованных пользователей
 # def categories(request):
 # '''контроллер страницы всех категорий'''
 # context = {
@@ -47,8 +59,9 @@ class MainListView(ListView):
 
 '''CBV подход'''
 
-class CategoriesListView(ListView):
+class CategoriesListView(LoginRequiredMixin, ListView):
     '''Контроллер страницы Категории'''
+    '''LoginRequiredMixin - скрывает контент от неавторизованных пользователей'''
     model = Category
     template_name = 'catalog/categories.html'
     extra_context = {
@@ -58,6 +71,7 @@ class CategoriesListView(ListView):
 
 
 # FBV подход
+# @login_required # скрывает контент от неавторизованных пользователей
 # def category_products(request, pk):
 # '''контроллер страницы всех товаров с категориями'''
 # category_item = Category.objects.get(pk=pk)
@@ -72,8 +86,9 @@ class CategoriesListView(ListView):
 
 '''CBV подход'''
 
-class CategoryProductsListView(ListView):
+class CategoryProductsListView(LoginRequiredMixin, ListView):
     '''Контроллер страницы товаров в конкретной Категории'''
+    '''LoginRequiredMixin - скрывает контент от неавторизованных пользователей'''
     model = Product
     template_name = 'catalog/products.html'
 
@@ -94,11 +109,13 @@ class CategoryProductsListView(ListView):
 
 
 
-class ProductCreateView(LoginRequiredMixin, CreateView):
+class ProductCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     '''CREATE - создается продукт (использование форм)'''
     '''LoginRequiredMixin - скрывает контент от неавторизованных пользователей'''
+    '''PermissionRequiredMixin - доступ для изменения контента, обязательное указание permission_required'''
     model = Product
     form_class = ProductForm
+    permission_required = 'catalog.add_product'
     success_url = reverse_lazy('catalog:index')
 
     def form_valid(self, form):
@@ -110,6 +127,7 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
 
 
 # FBV подход
+# @login_required # скрывает контент от неавторизованных пользователей
 # def products(request):
 # '''контроллер страницы всех товаров без категорий'''
 # products_list = Product.objects.all()
@@ -122,8 +140,9 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
 
 '''CBV подход'''
 
-class ProductsListView(ListView):
+class ProductsListView(LoginRequiredMixin, ListView):
     '''READ - Контролер страницы Товары. Отображает все товары без категорий'''
+    '''LoginRequiredMixin - скрывает контент от неавторизованных пользователей'''
     model = Product
     template_name = 'catalog/products_all.html'
     extra_context = {
@@ -133,6 +152,7 @@ class ProductsListView(ListView):
 
 
 # FBV подход
+# @login_required # скрывает контент от неавторизованных пользователей
 # def product_detailed(request, pk):
 # '''контроллер страницы одного товара'''
 # category_item = Product.objects.get(pk=pk)
@@ -152,8 +172,9 @@ class ProductsListView(ListView):
 
 '''CBV подход'''
 
-class ProductDetailView(DetailView):
+class ProductDetailView(LoginRequiredMixin, DetailView):
     '''READ - Контроллер страницы одного товара'''
+    '''LoginRequiredMixin - скрывает контент от неавторизованных пользователей'''
 
     model = Product
     template_name = 'catalog/product_detail.html'
@@ -163,12 +184,20 @@ class ProductDetailView(DetailView):
     }
 
 
-class ProductUpdateView(LoginRequiredMixin, UpdateView):
+class ProductUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     ''' UPDATE - обновление продукта (использование форм)'''
     '''LoginRequiredMixin - скрывают контент от неавторизованных пользователей'''
+    '''PermissionRequiredMixin - доступ для изменения контента, обязательное указание permission_required'''
     model = Product
     form_class = ProductForm
+    permission_required = 'catalog.change_product'
     success_url = reverse_lazy('catalog:index')
+
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset)
+        if self.object.user != self.request.user and not self.request.user.is_superuser:
+            raise Http404('Изменять может только владелец продукта')
+        return self.object
 
     def get_success_url(self):
         return reverse('catalog:product_detailed', args=[self.kwargs.get('pk')])
@@ -195,11 +224,13 @@ class ProductUpdateView(LoginRequiredMixin, UpdateView):
 
 
 
-class ProductDeleteView(LoginRequiredMixin, DeleteView):
+class ProductDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     '''DELETE - удаление продукта'''
     '''LoginRequiredMixin - скрывают контент от неавторизованных пользователей'''
+    '''PermissionRequiredMixin - доступ для изменения контента, обязательное указание permission_required'''
     model = Product
     success_url = reverse_lazy('catalog:index')
+    permission_required = 'catalog.delete_product'
 
 
 
@@ -221,8 +252,9 @@ class BlogCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class BlogListView(ListView):
+class BlogListView(LoginRequiredMixin, ListView):
     '''READ - чтение списка записей'''
+    '''LoginRequiredMixin - скрывает контент от неавторизованных пользователей'''
     model = Blog
     template_name = 'catalog/blog_index.html'
 
@@ -232,8 +264,9 @@ class BlogListView(ListView):
         return queryset
 
 
-class BlogDetailView(DetailView):
+class BlogDetailView(LoginRequiredMixin, DetailView):
     '''READ - чтение одной записи'''
+    '''LoginRequiredMixin - скрывает контент от неавторизованных пользователей'''
     model = Blog
     success_url = reverse_lazy('catalog:blog_detail')
 

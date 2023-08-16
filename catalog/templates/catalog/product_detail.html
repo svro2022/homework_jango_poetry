@@ -30,8 +30,12 @@
                         <hr>
 
                         <div class="btn-group">
-                        <a href="{% url 'catalog:product_update' object.pk %}" class="btn btn-primary">Edit</a>
-                        <a href="{% url 'catalog:product_delete' object.pk %}" class="btn btn-primary">Delete</a>
+                            {% if perms.catalog.change_product %}
+                            <a href="{% url 'catalog:product_update' object.pk %}" class="btn btn-primary">Edit</a>
+                            {% endif %}
+                            {% if perms.catalog.delete_product %}
+                            <a href="{% url 'catalog:product_delete' object.pk %}" class="btn btn-primary">Delete</a>
+                            {% endif %}
                         </div>
 
 

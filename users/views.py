@@ -11,6 +11,9 @@ from users.email_services import sendmail
 from django.shortcuts import redirect
 import random
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required
+
 
 class LoginView(BaseLoginView):
     '''Контроллер входа в профиль пользователя'''
@@ -65,8 +68,9 @@ class ConfirmPage(TemplateView):
         return context_data
 
 
-class UserUpdateView(UpdateView):
+class UserUpdateView(LoginRequiredMixin, UpdateView):
     '''Профиль пользователя'''
+    '''LoginRequiredMixin - скрывают контент от неавторизованных пользователей'''
     model = User
     form_class = UserProfileForm
     template_name = 'users/user_form.html'
@@ -76,6 +80,7 @@ class UserUpdateView(UpdateView):
         return self.request.user
 
 
+@login_required
 def generate_new_password(request):
     '''Изменение пароля'''
     new_password = ''.join([str(random.randint(0, 9)) for _ in range(12)])
