@@ -9,6 +9,7 @@ from django.forms import inlineformset_factory
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http import Http404
+from catalog.cache_services import categories_cache
 
 '''ФОРМА CATALOG'''
 
@@ -37,6 +38,7 @@ class MainListView(LoginRequiredMixin, ListView):
     }
 
     def get_queryset(self):
+        '''Доступ для группы модераторов'''
         queryset = super().get_queryset()
         if not self.request.user.is_staff:
             queryset = queryset.filter(is_published=True)
@@ -123,6 +125,13 @@ class ProductCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView)
 
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        '''кеш'''
+        context_data = super().get_context_data(**kwargs)
+        categories = categories_cache()
+        context_data['categories'] = categories
+        return context_data
+
 
 
 
@@ -149,6 +158,14 @@ class ProductsListView(LoginRequiredMixin, ListView):
         'title': 'Онлайн магазин',
         'title_text': 'Добро пожаловать! Ознакомьтесь с товарами.'
     }
+
+    def get_context_data(self, object_list=None, **kwargs):
+        '''кеш'''
+        context_data = super().get_context_data(object_list=object_list, **kwargs)
+        categories = categories_cache()
+        context_data['categories'] = categories
+
+        return context_data
 
 
 # FBV подход
@@ -183,6 +200,14 @@ class ProductDetailView(LoginRequiredMixin, DetailView):
         'title_text': 'Добро пожаловать! Ознакомьтесь с товаром.'
     }
 
+    def get_context_data(self, object_list=None, **kwargs):
+        '''Кеширование списка категорий'''
+        context_data = super().get_context_data(object_list=object_list, **kwargs)
+        categories = categories_cache()
+        context_data['categories'] = categories
+
+        return context_data
+
 
 class ProductUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     ''' UPDATE - обновление продукта (использование форм)'''
@@ -205,6 +230,11 @@ class ProductUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView)
     def get_context_data(self, **kwargs):
         '''Формирование формсета'''
         context_data = super().get_context_data(**kwargs)
+
+        '''кеш'''
+        categories = categories_cache()
+        context_data['categories'] = categories
+
         version_formset = inlineformset_factory(Product, Version, form=VersionForm, extra=1)
         if self.request.method == "POST":
             context_data['formset'] = version_formset(self.request.POST, instance=self.object)
@@ -231,6 +261,14 @@ class ProductDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView)
     model = Product
     success_url = reverse_lazy('catalog:index')
     permission_required = 'catalog.delete_product'
+
+    def get_context_data(self, object_list=None, **kwargs):
+        '''кеш'''
+        context_data = super().get_context_data(object_list=object_list, **kwargs)
+        categories = categories_cache()
+        context_data['categories'] = categories
+
+        return context_data
 
 
 

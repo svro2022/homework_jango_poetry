@@ -148,3 +148,15 @@ EMAIL_USE_SSl = True
 EMAIL_HOST_USER = 'student482skypro@rambler.ru'
 EMAIL_HOST_PASSWORD = '123Kazuha456'
 
+# CACHE
+# Redis
+CACHE_ENABLED = True
+if CACHE_ENABLED:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": "redis://127.0.0.1:6379",
+        }
+    }
+
+
